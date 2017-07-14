@@ -53,8 +53,6 @@ public class OrderPizza implements Serializable {
     private Menu menu;
     private Boolean submitted;
 
-    @Inject
-    private Testctrl testctrl;
 
     @PersistenceUnit(unitName = "pizzajpa")
     private EntityManagerFactory emf;
@@ -135,7 +133,7 @@ public class OrderPizza implements Serializable {
     }
 
     public String startOrder() {
-        System.out.println("Wert des Test:::::" + testctrl.getTest());
+
         return "toCustomer";
     }
 
