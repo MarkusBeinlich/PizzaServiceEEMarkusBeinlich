@@ -12,8 +12,14 @@
     <children>
         <TableView fx:id="orderTable" layoutX="84.0" layoutY="41.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <columns>
+                <TableColumn fx:id="customerIdColumn" prefWidth="75.0" text="Customer-ID" />
                 <TableColumn fx:id="firstNameColumn" prefWidth="75.0" text="Firstname" />
                 <TableColumn fx:id="lastNameColumn" prefWidth="75.0" text="Lastname" />
+                <TableColumn fx:id="orderIdColumn" prefWidth="75.0" text="Order-ID" />
+                <TableColumn fx:id="orderDateColumn" prefWidth="75.0" text="Order-Date" />
+                <TableColumn fx:id="nameColumn" prefWidth="75.0" text="Name" />
+                <TableColumn fx:id="priceColumn" prefWidth="75.0" text="Price" />
+                <TableColumn fx:id="quantityColumn" prefWidth="75.0" text="Quantity" />
             </columns>
         </TableView>
     </children>

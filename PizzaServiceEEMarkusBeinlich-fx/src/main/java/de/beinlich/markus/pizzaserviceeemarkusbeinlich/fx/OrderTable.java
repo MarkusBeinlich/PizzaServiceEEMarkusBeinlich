@@ -65,15 +65,15 @@ public class OrderTable {
     }
 
     public String getLastName() {
-        return firstName.get();
+        return lastName.get();
     }
 
     public void setLastName(String value) {
-        firstName.set(value);
+        lastName.set(value);
     }
 
     public StringProperty lastNameProperty() {
-        return firstName;
+        return lastName;
     }
 
     public String getDescription() {
