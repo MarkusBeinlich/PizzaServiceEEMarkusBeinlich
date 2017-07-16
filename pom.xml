@@ -31,6 +31,7 @@
     <module>PizzaServiceEEMarkusBeinlich-web</module>
     <module>PizzaServiceEEMarkusBeinlich-ejb</module>
     <module>PizzaServiceEEMarkusBeinlich-lib</module>
+    <module>PizzaServiceEEMarkusBeinlich-fx</module>
   </modules>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
