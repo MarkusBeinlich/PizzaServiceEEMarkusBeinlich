@@ -1,7 +1,11 @@
 package de.beinlich.markus.pizzaserviceeemarkusbeinlich.fx;
 
+import de.beinlich.markus.pizzaservice.ejb.OrderEjbRemote;
+import de.beinlich.markus.pizzaservice.model.OrderHeader;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.collections.FXCollections;
@@ -10,11 +14,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 public class MainApp extends Application {
 
     private final ObservableList<OrderTable> orderTable = FXCollections.observableArrayList();
     private Stage stage;
+    private static final OrderEjbRemote orderEjb = lookupOrderEjbRemote();
 
     public MainApp() {
         orderTable.add(new OrderTable(1, "Markus", "Beinlich", 1,
@@ -26,6 +34,9 @@ public class MainApp extends Application {
         orderTable.add(new OrderTable(1, "Markus", "Beinlich", 1,
                 LocalDateTime.now(), "4711", "127.0.0.1", "Pizza3",
                 "Salami, Tomaten", new BigDecimal(6), 2));
+        List<OrderHeader> orders;
+        orders = orderEjb.getAllOrderHeader();
+        System.out.println("Orders: " + orders.size());
     }
 
     @Override
@@ -62,5 +73,13 @@ public class MainApp extends Application {
     public ObservableList<OrderTable> getOrderTable() {
         return orderTable;
     }
-
+    private static OrderEjbRemote lookupOrderEjbRemote() {
+        try {
+            Context c = new InitialContext();
+            return (OrderEjbRemote) c.lookup("ejb/orderEjb");
+        } catch (NamingException ne) {
+            System.out.println("" + ne);
+            throw new RuntimeException(ne);
+        }
+    }
 }

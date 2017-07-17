@@ -6,6 +6,7 @@
 package de.beinlich.markus.pizzaservice.ejb;
 
 import de.beinlich.markus.pizzaservice.model.OrderHeader;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
@@ -13,6 +14,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
+import javax.persistence.TypedQuery;
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.NotSupportedException;
@@ -24,7 +26,7 @@ import javax.transaction.UserTransaction;
  *
  * @author Markus Beinlich
  */
-@Stateless (mappedName = "ejb/orderEjb")
+@Stateless(mappedName = "ejb/orderEjb")
 public class OrderEjb implements OrderEjbRemote {
 
     @PersistenceUnit(unitName = "pizzajpa")
@@ -57,5 +59,16 @@ public class OrderEjb implements OrderEjbRemote {
         } catch (IllegalStateException ex) {
             Logger.getLogger(OrderEjb.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    @Override
+    public List<OrderHeader> getAllOrderHeader() {
+
+        EntityManager em = emf.createEntityManager();
+        TypedQuery<OrderHeader> query = em.createNamedQuery(OrderHeader.findAll, OrderHeader.class);
+        List<OrderHeader> orders = query.getResultList();
+        System.out.println("getAllOrderHeader1:" + orders.size() + "-" + orders.hashCode() + "-" + orders.get(0).getOrderEntries().toString());
+        return orders;
+
     }
 }

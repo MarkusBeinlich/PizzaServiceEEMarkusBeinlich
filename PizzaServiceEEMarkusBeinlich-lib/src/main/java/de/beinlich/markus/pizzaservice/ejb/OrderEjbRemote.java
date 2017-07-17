@@ -6,6 +6,7 @@
 package de.beinlich.markus.pizzaservice.ejb;
 
 import de.beinlich.markus.pizzaservice.model.OrderHeader;
+import java.util.List;
 import javax.ejb.Remote;
 
 /**
@@ -14,6 +15,6 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface OrderEjbRemote {
-    
+    public List<OrderHeader> getAllOrderHeader();
     public void saveOrder(OrderHeader order);
 }
