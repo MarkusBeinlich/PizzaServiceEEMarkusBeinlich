@@ -107,6 +107,15 @@
                     </additionalClasspathElements>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ejb-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <!-- this is false by default -->
+                    <generateClient>true</generateClient>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <dependencies>
