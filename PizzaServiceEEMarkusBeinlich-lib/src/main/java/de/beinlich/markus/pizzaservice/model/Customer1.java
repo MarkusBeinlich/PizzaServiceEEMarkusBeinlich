@@ -5,11 +5,15 @@
  */
 package de.beinlich.markus.pizzaservice.model;
 
+import java.io.Serializable;
+
 /**
  *
  * @author schulung
  */
-public class Customer1 {
+public class Customer1 implements Serializable{
+
+    private static final long serialVersionUID = 6041779523439137448L;
     private String email;
     private String password;
 

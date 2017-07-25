@@ -46,7 +46,7 @@ public class OrderPdfServlet extends HttpServlet {
             resp.setContentType("application/pdf");
 
             try (OutputStream os = resp.getOutputStream()) {
-                orderPizza.getOrder().createPdf().writeTo(os);
+//                orderPizza.getOrder().createPdf().writeTo(os);
                 os.flush();
             }
 

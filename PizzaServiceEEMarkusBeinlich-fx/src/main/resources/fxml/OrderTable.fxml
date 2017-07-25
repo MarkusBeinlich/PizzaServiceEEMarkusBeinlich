@@ -6,9 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 
 <AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="1000.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.beinlich.markus.pizzaserviceeemarkusbeinlich.fx.OrderTableController">
-    <stylesheets>
-        <URL value="@/styles/ordertable.css" />
-    </stylesheets>
+
     <children>
         <TableView fx:id="orderTable" layoutX="84.0" layoutY="41.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <columns>

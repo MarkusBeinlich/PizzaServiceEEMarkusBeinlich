@@ -1,8 +1,9 @@
 package de.beinlich.markus.pizzaservice.controller;
 
-
+import de.beinlich.markus.pizzaservice.ejb.MenuEjbRemote;
+import de.beinlich.markus.pizzaservice.ejb.OrderEjbRemote;
 import de.beinlich.markus.pizzaservice.model.Customer;
-import de.beinlich.markus.pizzaservice.model.Invoice;
+import de.beinlich.markus.pizzaservice.model.Invoice; 
 import de.beinlich.markus.pizzaservice.model.Menu;
 import de.beinlich.markus.pizzaservice.model.MenuItem;
 import de.beinlich.markus.pizzaservice.model.OrderEntry;
@@ -13,27 +14,19 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Resource;
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.inject.*;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceUnit;
-import javax.persistence.TypedQuery;
+import javax.inject.Named;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.NotSupportedException;
-import javax.transaction.RollbackException;
-import javax.transaction.SystemException;
-import javax.transaction.UserTransaction;
 import org.primefaces.context.RequestContext;
 
 /**
@@ -44,6 +37,10 @@ import org.primefaces.context.RequestContext;
 @SessionScoped
 public class OrderPizza implements Serializable {
 
+    private final OrderEjbRemote orderEjb = lookupOrderEjbRemote();
+
+    private final MenuEjbRemote menuEjb = lookupMenuEjbRemote();
+
     private static final long serialVersionUID = 4711892445353241012L;
 
     private Customer customer;
@@ -53,19 +50,38 @@ public class OrderPizza implements Serializable {
     private Menu menu;
     private Boolean submitted;
 
-
-    @PersistenceUnit(unitName = "pizzajpa")
-    private EntityManagerFactory emf;
-
-    @Resource
-    private UserTransaction ut;
-
     public OrderPizza() {
+
+    }
+
+    @PostConstruct
+    private void initOrderPizza() {
+        System.out.println("@PostConstruct OrderPizza");
         customer = new Customer();
         invoice = new Invoice();
         order = new OrderHeader();
         menu = new Menu();
         submitted = false;
+    }
+
+    private OrderEjbRemote lookupOrderEjbRemote() {
+        try {
+            Context c = new InitialContext();
+            return (OrderEjbRemote) c.lookup("ejb/orderEjb");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
+    }
+
+    private MenuEjbRemote lookupMenuEjbRemote() {
+        try {
+            Context c = new InitialContext();
+            return (MenuEjbRemote) c.lookup("ejb/menuEjb");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
     }
 
     public void submitOrder() {
@@ -76,37 +92,17 @@ public class OrderPizza implements Serializable {
     }
 
     public void save() {
-        try {
-            HttpServletRequest req = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-            order.setIpAddress(req.getLocalAddr());
-            order.setSessionId(req.getSession().getId());
-            System.out.println("OrderPizza - save");
-            System.out.println("OrderPizza.save: ip-" + order.getIpAddress() + " session: " + order.getSessionId());
+
+        HttpServletRequest req = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        order.setIpAddress(req.getLocalAddr());
+        order.setSessionId(req.getSession().getId());
+        System.out.println("OrderPizza - save");
+        System.out.println("OrderPizza.save: ip-" + order.getIpAddress() + " session: " + order.getSessionId());
 //            customer.store();
-            order.setCustomer(customer);
-            order.setOrderDate(LocalDateTime.now());
-//            order.store();
-            ut.begin();
-            EntityManager em
-                    = emf.createEntityManager();
-            em.persist(customer);
-            em.persist(order);
-            ut.commit();
-        } catch (NotSupportedException ex) {
-            Logger.getLogger(OrderPizza.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SystemException ex) {
-            Logger.getLogger(OrderPizza.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (RollbackException ex) {
-            Logger.getLogger(OrderPizza.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (HeuristicMixedException ex) {
-            Logger.getLogger(OrderPizza.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (HeuristicRollbackException ex) {
-            Logger.getLogger(OrderPizza.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
-            Logger.getLogger(OrderPizza.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalStateException ex) {
-            Logger.getLogger(OrderPizza.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        order.setCustomer(customer);
+        order.setOrderDate(LocalDateTime.now());
+
+        orderEjb.saveOrder(order);
     }
 
     public void showPdf() {
@@ -128,7 +124,7 @@ public class OrderPizza implements Serializable {
             if (menuItem.getQuantity() != 0) {
                 order.addOrderEntry(new OrderEntry(menuItem));
                 System.out.println("MenuItem <> 0:" + menuItem.getName());
-            } 
+            }
         }
     }
 
@@ -204,12 +200,7 @@ public class OrderPizza implements Serializable {
 
     public Menu getMenu() {
         if (menu.getMenuItems().isEmpty()) {
-            EntityManager em = emf.createEntityManager();
-            TypedQuery<Menu> query = em.createNamedQuery(Menu.findAll, Menu.class);
-            List<Menu> menus = query.getResultList();
-            System.out.println("getMenu1:" + menus.size() + "-" + menu.hashCode() + "-" + menus.get(0).getMenuItems().toString());
-            menu = menus.get(0);
-            return menu;
+            menu = menuEjb.getMenu(menu);
         }
         System.out.println("getMenu2:" + menu.toString());
         return menu;
@@ -220,26 +211,8 @@ public class OrderPizza implements Serializable {
     }
 
     public void addMenu() {
-        try {
-            ut.begin();
-            EntityManager em = emf.createEntityManager();
-            em.persist(menu);
-            ut.commit();
-        } catch (NotSupportedException ex) {
-            Logger.getLogger(OrderPizza.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SystemException ex) {
-            Logger.getLogger(OrderPizza.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (RollbackException ex) {
-            Logger.getLogger(OrderPizza.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (HeuristicMixedException ex) {
-            Logger.getLogger(OrderPizza.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (HeuristicRollbackException ex) {
-            Logger.getLogger(OrderPizza.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
-            Logger.getLogger(OrderPizza.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalStateException ex) {
-            Logger.getLogger(OrderPizza.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        System.out.println("addMenu" + menu.getMenuItems().size());
+        menuEjb.addMenu(menu);
     }
 
     public String initMenu() {
@@ -250,15 +223,14 @@ public class OrderPizza implements Serializable {
         menuItem.setPrice(new BigDecimal(7.5));
         menuItem.setMenu(menu);
         menu.getMenuItems().add(menuItem);
-        
-        
+
         MenuItem menuItem2 = new MenuItem();
         menuItem2.setName("Pizza2");
         menuItem2.setDescription("Salami, Schinken, Mozarella");
         menuItem2.setPrice(new BigDecimal(8.5));
         menuItem2.setMenu(menu);
         menu.getMenuItems().add(menuItem2);
-        
+
         MenuItem menuItem3 = new MenuItem();
 
         menuItem3.setName("Pizza3");
@@ -266,8 +238,9 @@ public class OrderPizza implements Serializable {
         menuItem3.setPrice(new BigDecimal(4.5));
         menuItem3.setMenu(menu);
         menu.getMenuItems().add(menuItem3);
-        
+
         System.out.println("initMenu" + menu);
+        this.menu = menu;
         addMenu();
         return ("toAdmin");
     }

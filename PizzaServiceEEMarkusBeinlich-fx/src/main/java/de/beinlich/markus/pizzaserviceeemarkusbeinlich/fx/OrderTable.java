@@ -42,6 +42,9 @@ public class OrderTable {
         this.customerId = new SimpleIntegerProperty(customerId);
         this.firstName = new SimpleStringProperty(firstName);
         this.lastName = new SimpleStringProperty(lastName);
+        if (orderId == null) {
+            orderId = -1;
+        }
         this.orderId = new SimpleIntegerProperty(orderId);
         this.orderDate = new SimpleObjectProperty<>(orderDate);
         this.sessionId = new SimpleStringProperty(sessionId);

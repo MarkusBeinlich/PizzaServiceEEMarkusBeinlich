@@ -2,11 +2,13 @@ package de.beinlich.markus.pizzaservice.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.Version;
 
 /**
  *
@@ -16,12 +18,14 @@ import javax.persistence.OneToOne;
 public class OrderEntry implements Serializable{
 
     private static final long serialVersionUID = -6948893238653679210L;
-    
+    @Version
+    private Long lastUpdate;
     @Id
     @GeneratedValue
     private Integer orderEntryId;
     private String name;
     private String description;
+    @Column(precision = 8, scale = 2)
     private BigDecimal price;
     private int quantity;
     @ManyToOne

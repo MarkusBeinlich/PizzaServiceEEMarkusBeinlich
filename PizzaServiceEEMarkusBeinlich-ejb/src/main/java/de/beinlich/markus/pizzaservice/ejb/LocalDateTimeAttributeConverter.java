@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.beinlich.markus.pizzaservice.model;
+package de.beinlich.markus.pizzaservice.ejb;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;

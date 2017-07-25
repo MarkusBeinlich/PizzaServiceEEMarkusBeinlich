@@ -5,28 +5,31 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.Version;
 
 @Entity
-@NamedQuery(name = Menu.findAll, query = "SELECT m FROM Menu m")
-public class Menu implements Serializable{
+@NamedQuery(name = "Menu.findAll", query = "SELECT m FROM Menu m")
+public class Menu implements Serializable {
+
     private static final long serialVersionUID = 9220765761231182677L;
     public static final String findAll = "Menu.findAll";
-    
+    @Version
+    private Long lastUpdate;
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.TABLE)
     private Integer menuId;
-    @OneToMany(mappedBy = "menu", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "menu", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private List<MenuItem> menuItems;
 
     public Menu() {
         if (menuItems == null) {
             menuItems = new ArrayList<>();
-//            DaoMenu daoMenu = new DaoMenu();
-//            menuItems = daoMenu.getMenu();
         }
     }
 
@@ -36,16 +39,6 @@ public class Menu implements Serializable{
 
     public void setMenuItems(List<MenuItem> menuItems) {
         this.menuItems = menuItems;
-    }
-    
-    
-
-    public static void main(String[] args) {
-        Menu m = new Menu();
-        for (MenuItem mItem : m.getMenuItems()) {
-            System.out.println(" " + mItem.getName());
-        }
-
     }
 
     public Integer getMenuId() {
@@ -60,6 +53,5 @@ public class Menu implements Serializable{
     public String toString() {
         return "Menu{" + "menuId=" + menuId + ", menuItems=" + menuItems + '}';
     }
-    
-    
+
 }

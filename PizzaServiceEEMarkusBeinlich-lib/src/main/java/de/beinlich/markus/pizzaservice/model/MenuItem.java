@@ -2,11 +2,13 @@ package de.beinlich.markus.pizzaservice.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
+import javax.persistence.Version;
 
 @Entity
 @NamedQuery(name = MenuItem.findAll, query = "SELECT m FROM MenuItem m")
@@ -15,7 +17,8 @@ public class MenuItem implements Serializable {
     private static final long serialVersionUID = 4017341755034502641L;
     
     public static final String findAll = "MenuItem.findAll";
-    
+    @Version
+    private Long lastUpdate;
     @Id
     @GeneratedValue
     private Integer menuItemId;
@@ -23,6 +26,7 @@ public class MenuItem implements Serializable {
     private Menu menu;
     private String name;
     private String description;
+    @Column(precision = 8, scale = 2)
     private BigDecimal price;
     private int quantity;
 
