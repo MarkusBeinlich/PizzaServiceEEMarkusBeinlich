@@ -21,7 +21,7 @@ public abstract class AbstractPage {
     @Drone
     private WebDriver browser;
     
-    @FindBy(xpath = "//h1")
+    @FindBy(xpath = "//h2")
     private WebElement title;
     
     private String getString(String key){

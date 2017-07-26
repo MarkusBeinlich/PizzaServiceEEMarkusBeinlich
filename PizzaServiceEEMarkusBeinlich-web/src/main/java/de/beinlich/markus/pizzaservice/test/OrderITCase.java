@@ -5,8 +5,11 @@
  */
 package de.beinlich.markus.pizzaservice.test;
 
+import de.beinlich.markus.pizzaservice.test.pages.MenuPage;
 import org.jboss.arquillian.drone.api.annotation.Drone;
+import org.jboss.arquillian.graphene.page.Page;
 import org.jboss.arquillian.junit.Arquillian;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
 
@@ -18,5 +21,12 @@ import org.openqa.selenium.WebDriver;
 public class OrderITCase {
     @Drone
     private WebDriver browser;
-    
+    @Page
+    private MenuPage menuPage;
+
+    @Test
+    public void testAddOrder(){
+        menuPage.assertOnPage();
+        menuPage.doInput();
+    }
 }

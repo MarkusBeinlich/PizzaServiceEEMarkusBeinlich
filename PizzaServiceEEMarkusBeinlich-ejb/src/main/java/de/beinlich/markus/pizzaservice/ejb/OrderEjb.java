@@ -36,6 +36,7 @@ public class OrderEjb implements OrderEjbRemote {
 //            em.persist(order.getCustomer());
             em.persist(order.getCustomer());
             em.persist(order);
+            em.flush();
             System.out.println("saveOrder fire1");
             OrderEvent newOrder = new OrderEvent();
             newOrder.setOrder(order);
