@@ -16,7 +16,7 @@ import javax.persistence.Version;
 public class Customer implements Serializable {
 
     private static final long serialVersionUID = -565390959945252363L;
-    @Version
+    @Version 
     private Long lastUpdate;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
