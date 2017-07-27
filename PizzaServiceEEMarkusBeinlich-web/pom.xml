@@ -96,17 +96,7 @@
             <artifactId>primefaces</artifactId>
             <version>6.1</version>
         </dependency>
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>itextpdf</artifactId>
-            <version>5.5.11</version>
-        </dependency>
 
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>itext-pdfa</artifactId>
-            <version>5.5.11</version>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/junit/junit -->
         <dependency>
             <groupId>junit</groupId>
@@ -135,7 +125,7 @@
         <!-- https://mvnrepository.com/artifact/org.jboss.arquillian.container/arquillian-glassfish-embedded-3.1 -->
         <dependency>
             <groupId>org.jboss.arquillian.container</groupId>
-            <artifactId>arquillian-glassfish-embedded-3.1</artifactId>
+            <artifactId>arquillian-glassfish-managed-3.1</artifactId>
             <version>1.0.1</version>
             <scope>test</scope>
         </dependency>
