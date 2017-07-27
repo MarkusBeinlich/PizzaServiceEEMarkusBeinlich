@@ -18,7 +18,7 @@ import org.openqa.selenium.WebDriver;
  * @author Markus
  */
 @RunWith(Arquillian.class)
-public class OrderITCase {
+public class OrderITCase extends AbstractItCase{
     @Drone
     private WebDriver browser;
     @Page

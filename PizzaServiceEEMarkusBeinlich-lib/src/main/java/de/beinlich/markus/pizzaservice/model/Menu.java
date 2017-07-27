@@ -22,7 +22,7 @@ public class Menu implements Serializable {
     @Version
     private Long lastUpdate;
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer menuId;
     @OneToMany(mappedBy = "menu", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private List<MenuItem> menuItems;

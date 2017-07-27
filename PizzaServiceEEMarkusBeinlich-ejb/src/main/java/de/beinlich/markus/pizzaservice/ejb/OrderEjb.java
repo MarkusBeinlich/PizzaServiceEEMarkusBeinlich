@@ -5,6 +5,7 @@
  */
 package de.beinlich.markus.pizzaservice.ejb;
 
+import de.beinlich.markus.pizzaservice.model.Customer;
 import de.beinlich.markus.pizzaservice.model.OrderHeader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,8 +33,9 @@ public class OrderEjb implements OrderEjbRemote {
     @Override
     public void saveOrder(OrderHeader order) {
         try {
-//            EntityManager em = emf.createEntityManager();
-//            em.persist(order.getCustomer());
+//            Customer customer;
+//            customer = order.getCustomer();
+//            em.persist(customer);
             em.persist(order.getCustomer());
             em.persist(order);
             em.flush();

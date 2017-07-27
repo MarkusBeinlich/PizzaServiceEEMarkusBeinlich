@@ -19,7 +19,7 @@ public class Customer implements Serializable {
     @Version 
     private Long lastUpdate;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer customerId;
     @OneToMany(mappedBy = "customer", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private List<OrderHeader> orderHeaders;

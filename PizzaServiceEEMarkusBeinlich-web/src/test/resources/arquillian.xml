@@ -7,7 +7,7 @@
  
     <container qualifier="glassfish" default="true">
         <configuration>
-            <property name="glassFishHome">C:\glassfish4</property>
+            <property name="glassFishHome">C:\glassfish-4.1\glassfish4\glassfish</property>
             <property name="adminHost">localhost</property>
             <property name="adminPort">4848</property>
         </configuration>

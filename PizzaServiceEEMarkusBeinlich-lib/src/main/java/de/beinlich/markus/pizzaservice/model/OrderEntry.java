@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
@@ -15,13 +16,13 @@ import javax.persistence.Version;
  * @author Markus Beinlich
  */
 @Entity
-public class OrderEntry implements Serializable{
+public class OrderEntry implements Serializable {
 
     private static final long serialVersionUID = -6948893238653679210L;
     @Version
     private Long lastUpdate;
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer orderEntryId;
     private String name;
     private String description;
@@ -40,7 +41,6 @@ public class OrderEntry implements Serializable{
 
     public OrderEntry() {
     }
-
 
     public int getQuantity() {
         return quantity;
