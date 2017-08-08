@@ -5,7 +5,7 @@
  */
 package de.beinlich.markus.pizzaservice.ejb;
 
-import de.beinlich.markus.pizzaservice.model.Menu;
+import de.beinlich.markus.pizzaservice.model.Customer;
 import javax.ejb.Remote;
 
 /**
@@ -13,8 +13,11 @@ import javax.ejb.Remote;
  * @author Markus Beinlich
  */
 @Remote
-public interface MenuEjbRemote {
-      public Menu getMenu(Menu menu);
-      public void addMenu(Menu menu);
-      public Menu updateMenu(Menu menu);
+public interface CustomerEjbRemote {
+
+    public Customer getCustomerByEmail(String email);
+
+    public void addCustomer(Customer customer);
+
+    public Customer updateCustomer(Customer customer);
 }

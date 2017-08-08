@@ -1,9 +1,10 @@
 package de.beinlich.markus.pizzaservice.controller;
 
+import de.beinlich.markus.pizzaservice.ejb.CustomerEjbRemote;
 import de.beinlich.markus.pizzaservice.ejb.MenuEjbRemote;
 import de.beinlich.markus.pizzaservice.ejb.OrderEjbRemote;
 import de.beinlich.markus.pizzaservice.model.Customer;
-import de.beinlich.markus.pizzaservice.model.Invoice; 
+import de.beinlich.markus.pizzaservice.model.Invoice;
 import de.beinlich.markus.pizzaservice.model.Menu;
 import de.beinlich.markus.pizzaservice.model.MenuItem;
 import de.beinlich.markus.pizzaservice.model.OrderEntry;
@@ -17,11 +18,21 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.enterprise.context.SessionScoped;
+import javax.enterprise.event.Observes;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.jms.JMSConnectionFactory;
+import javax.jms.JMSContext;
+import javax.jms.JMSException;
+import javax.jms.JMSProducer;
+import javax.jms.ObjectMessage;
+import javax.jms.Queue;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -37,6 +48,8 @@ import org.primefaces.context.RequestContext;
 @SessionScoped
 public class OrderPizza implements Serializable {
 
+    private final CustomerEjbRemote customerEjb = lookupCustomerEjbRemote();
+
     private final OrderEjbRemote orderEjb = lookupOrderEjbRemote();
 
     private final MenuEjbRemote menuEjb = lookupMenuEjbRemote();
@@ -49,6 +62,13 @@ public class OrderPizza implements Serializable {
     private String time;
     private Menu menu;
     private Boolean submitted;
+    private MenuItem newMenuItem;
+    private MenuItem selectedMenuItem;
+
+    private enum OrderStatus {
+        MENU, CUSTOMER, CONFIRMATION
+    };
+    private OrderStatus orderStatus;
 
     public OrderPizza() {
 
@@ -62,6 +82,18 @@ public class OrderPizza implements Serializable {
         order = new OrderHeader();
         menu = new Menu();
         submitted = false;
+        newMenuItem = new MenuItem();
+        orderStatus = OrderStatus.MENU;
+    }
+
+    private CustomerEjbRemote lookupCustomerEjbRemote() {
+        try {
+            Context c = new InitialContext();
+            return (CustomerEjbRemote) c.lookup("ejb/customerEjb");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
     }
 
     private OrderEjbRemote lookupOrderEjbRemote() {
@@ -84,15 +116,19 @@ public class OrderPizza implements Serializable {
         }
     }
 
-    public void submitOrder() {
-        this.save();
-        submitted = true;
-        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Vielen Dank für Ihre Bestellung", "Guten Appetit.");
-        RequestContext.getCurrentInstance().showMessageInDialog(message);
+    // DAs geht leider nicht, da das Event ja in einer anderen JVM ausgeführt wird
+//    public void getNewOrderHeader(@Observes OrderEvent orderEvent) {
+//        System.out.println("getNewOrderHeader - OrderPizza");
+//        customer.getOrderHeaders().add(orderEvent.getOrder());
+//    }
+    public void deleteMenuItem(MenuItem menuItem) {
+//        System.out.println("delete:" + selectedMenuItem.getName());
+//        menu.getMenuItems().remove(selectedMenuItem);
+        menu.getMenuItems().remove(menuItem);
+//        selectedMenuItem = null;
     }
 
-    public void save() {
-
+    public void submitOrder() {
         HttpServletRequest req = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         order.setIpAddress(req.getLocalAddr());
         order.setSessionId(req.getSession().getId());
@@ -102,6 +138,32 @@ public class OrderPizza implements Serializable {
         order.setCustomer(customer);
         order.setOrderDate(LocalDateTime.now());
 
+        this.saveJms();
+        submitted = true;
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Vielen Dank für Ihre Bestellung", "Guten Appetit.");
+        RequestContext.getCurrentInstance().showMessageInDialog(message);
+    }
+    @Inject
+    @JMSConnectionFactory("jms/myConnectionFactory")
+    private JMSContext context;
+
+    @Resource(lookup = "jms/PizzaOrderQueue")
+    Queue pizzaOrderQueue;
+
+    public void saveJms() {
+
+        JMSProducer producer = context.createProducer();
+        ObjectMessage objectMessage = context.createObjectMessage();
+        try {
+            objectMessage.setObject(order);
+            producer.send(pizzaOrderQueue, objectMessage);
+        } catch (JMSException ex) {
+            Logger.getLogger(OrderPizza.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    public void save() {
         orderEjb.saveOrder(order);
     }
 
@@ -128,18 +190,41 @@ public class OrderPizza implements Serializable {
         }
     }
 
-    public String startOrder() {
+    @Inject
+    SigninController signinController;
 
+    public void listenToLogin(@Observes LoginEvent loginEvent) {
+        System.out.println("listenToLogin");
+        this.customer = getCustomerByEmail();
+        System.out.println("listenToLogin2");
+    }
+
+    public String startOrder() {
+        System.out.println("startOrder");
+        if (customer.getEmail() == null) {
+            orderStatus = OrderStatus.CUSTOMER;
+            return "toCustomer";
+        } else {
+            orderStatus = OrderStatus.CONFIRMATION;
+            return "toConfirmation";
+        }
+
+    }
+
+    public String enterCustomer() {
+        System.out.println("enterCustomer1");
         return "toCustomer";
     }
 
-    public String login() {
-        System.out.println("-------------------login");
-        return "toLogin";
-    }
-
     public String customerEntered() {
-        return "toConfirmation";
+        switch (orderStatus) {
+            case CONFIRMATION:
+                return "toConfirmation";
+            case MENU:
+                return "toMenu";
+            default:
+                return "toConfirmation";
+        }
     }
 
     public void setIpAndSession(HttpServletRequest req) {
@@ -198,6 +283,18 @@ public class OrderPizza implements Serializable {
         this.time = time;
     }
 
+    public Customer getCustomerByEmail() {
+        HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        Customer customerDb;
+        customerDb = customerEjb.getCustomerByEmail(request.getUserPrincipal().getName());
+        if (customerDb != null) {
+            this.customer = customerDb;
+            System.out.println("customerDb <> null");
+        }
+        System.out.println("getCustomer:" + request.getUserPrincipal().getName() + " - " + customer.getLastName() + " - " + customer.getOrderHeaders().size());
+        return customer;
+    }
+
     public Menu getMenu() {
         if (menu.getMenuItems().isEmpty()) {
             menu = menuEjb.getMenu(menu);
@@ -213,6 +310,21 @@ public class OrderPizza implements Serializable {
     public void addMenu() {
         System.out.println("addMenu" + menu.getMenuItems().size());
         menuEjb.addMenu(menu);
+        showMessage("Die Speisekarte wurde gespeichert.");
+    }
+
+    public void updateMenu() {
+        System.out.println("updateMenu" + menu.getMenuItems().size());
+        menu = menuEjb.updateMenu(menu);
+        showMessage("Die Speisekarte wurde gespeichert.");
+    }
+
+    public void addMenuItem() {
+        System.out.println("addMenuItem:" + newMenuItem.getName());
+        newMenuItem.setMenuItemId(menu.getMenuItems().get(menu.getMenuItems().size() - 1).getMenuItemId() + 1);
+        newMenuItem.setMenu(menu);
+        menu.getMenuItems().add(newMenuItem);
+        newMenuItem = new MenuItem();
     }
 
     public String initMenu() {
@@ -258,4 +370,33 @@ public class OrderPizza implements Serializable {
         return sessions;
     }
 
+    public MenuItem getNewMenuItem() {
+        return newMenuItem;
+    }
+
+    public void setNewMenuItem(MenuItem newMenuItem) {
+        this.newMenuItem = newMenuItem;
+    }
+
+    public MenuItem getSelectedMenuItem() {
+        return selectedMenuItem;
+    }
+
+    public void setSelectedMenuItem(MenuItem selectedMenuItem) {
+        this.selectedMenuItem = selectedMenuItem;
+    }
+
+    public void showMessage(String text) {
+        FacesMessage message = new FacesMessage(text);
+
+        RequestContext.getCurrentInstance().showMessageInDialog(message);
+    }
+
+    public OrderStatus getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
 }

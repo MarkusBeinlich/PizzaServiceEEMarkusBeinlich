@@ -1,7 +1,6 @@
 package de.beinlich.markus.pizzaservice.model;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -9,14 +8,18 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
 
 @Entity
+@NamedQuery(name="Customer.findByEmail", query = "SELECT c FROM Customer c " +
+        "WHERE c.email = :email" )
 public class Customer implements Serializable {
 
     private static final long serialVersionUID = -565390959945252363L;
-    @Version 
+    public static final String findByEmail = "Customer.findByEmail";
+    @Version
     private Long lastUpdate;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -101,6 +104,22 @@ public class Customer implements Serializable {
 
     public void setPostcode(String postcode) {
         this.postcode = postcode;
+    }
+
+    public Long getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(Long lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
+
+    public List<OrderHeader> getOrderHeaders() {
+        return orderHeaders;
+    }
+
+    public void setOrderHeaders(List<OrderHeader> orderHeaders) {
+        this.orderHeaders = orderHeaders;
     }
 
 }

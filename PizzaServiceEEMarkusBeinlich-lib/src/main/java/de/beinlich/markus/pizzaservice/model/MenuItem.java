@@ -41,6 +41,7 @@ public class MenuItem implements Serializable {
     }
 
     public Integer getMenuItemId() {
+        System.out.println("getMenuItemId:" + menuItemId);
         return menuItemId;
     }
 

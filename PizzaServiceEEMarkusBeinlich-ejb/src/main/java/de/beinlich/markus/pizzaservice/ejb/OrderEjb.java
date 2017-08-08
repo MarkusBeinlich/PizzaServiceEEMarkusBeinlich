@@ -28,18 +28,20 @@ public class OrderEjb implements OrderEjbRemote {
     private EntityManager em;
 
     @Inject
-    Event<OrderEvent> orderEvent;
+    private Event<OrderEvent> orderEvent;
 
     @Override
     public void saveOrder(OrderHeader order) {
         try {
+//            EntityManager em = emf.createEntityManager();
+//            em.persist(order.getCustomer());
+//            em.persist(order.getCustomer());
+            order = em.merge(order);
 //            Customer customer;
 //            customer = order.getCustomer();
 //            em.persist(customer);
-            em.persist(order.getCustomer());
-            em.persist(order);
             em.flush();
-            System.out.println("saveOrder fire1");
+            System.out.println("saveOrder fire1------------------------>");
             OrderEvent newOrder = new OrderEvent();
             newOrder.setOrder(order);
             orderEvent.fire(newOrder);

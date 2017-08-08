@@ -25,7 +25,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Version;
 
 @Entity
-@NamedQuery(name = OrderHeader.findAll, query = "SELECT oh FROM OrderHeader oh")
+@NamedQuery(name = OrderHeader.findAll, query = "SELECT oh FROM OrderHeader oh ")
 public class OrderHeader implements Serializable {
 
     private static final long serialVersionUID = 4994150745256346814L;
@@ -38,7 +38,7 @@ public class OrderHeader implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer orderId;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     private Customer customer;
 
     @OneToMany(mappedBy = "orderHeader", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
@@ -144,6 +144,9 @@ public class OrderHeader implements Serializable {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+        if (customer.getOrderHeaders() != null && customer.getOrderHeaders().contains(this)== false) {
+            customer.getOrderHeaders().add(this);
+        }
     }
 
     public Integer getOrderId() {
