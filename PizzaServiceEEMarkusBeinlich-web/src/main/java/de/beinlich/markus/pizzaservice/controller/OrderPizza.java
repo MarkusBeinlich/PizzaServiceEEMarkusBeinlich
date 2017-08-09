@@ -144,10 +144,10 @@ public class OrderPizza implements Serializable {
         RequestContext.getCurrentInstance().showMessageInDialog(message);
     }
     @Inject
-    @JMSConnectionFactory("jms/myConnectionFactory")
+    @JMSConnectionFactory("java:comp/DefaultJMSConnectionFactory")
     private JMSContext context;
 
-    @Resource(lookup = "jms/PizzaOrderQueue")
+    @Resource(lookup = "jms/queue/PizzaOrderQueue")
     Queue pizzaOrderQueue;
 
     public void saveJms() {

@@ -28,24 +28,24 @@ import javax.jms.Topic;
 //            @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic")})
 public class OrderMessageEjb {
 
-    @Resource(lookup = "jms/PizzaTopic")
-    private Topic destination;
-
-    @Inject
-    @JMSConnectionFactory("jms/PizzaTopicConnectionFactory")
-    private JMSContext context;
+//    @Resource(lookup = "jms/PizzaTopic")
+//    private Topic destination;
+//
+//    @Inject
+//    @JMSConnectionFactory("jms/PizzaTopicConnectionFactory")
+//    private JMSContext context;
 
     public void getNewOrderHeader(@Observes OrderEvent orderEvent) {
 
-        System.out.println("getNewOrderHeader1:" + orderEvent.getOrder().getOrderDate());
-        try {
-            JMSProducer producer = context.createProducer();
-            ObjectMessage objectMessage = context.createObjectMessage();
-            objectMessage.setObject(orderEvent.getOrder());
-            producer = producer.send(destination, objectMessage);
-            System.out.println("producer:" + producer.getJMSCorrelationID());
-        } catch (JMSException ex) {
-            Logger.getLogger(OrderMessageEjb.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        System.out.println("getNewOrderHeader1:" + orderEvent.getOrder().getOrderDate());
+//        try {
+//            JMSProducer producer = context.createProducer();
+//            ObjectMessage objectMessage = context.createObjectMessage();
+//            objectMessage.setObject(orderEvent.getOrder());
+//            producer = producer.send(destination, objectMessage);
+//            System.out.println("producer:" + producer.getJMSCorrelationID());
+//        } catch (JMSException ex) {
+//            Logger.getLogger(OrderMessageEjb.class.getName()).log(Level.SEVERE, null, ex);
+//        }
     }
 }

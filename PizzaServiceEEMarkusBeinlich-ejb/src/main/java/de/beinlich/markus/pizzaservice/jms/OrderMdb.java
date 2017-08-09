@@ -21,7 +21,7 @@ import javax.jms.MessageListener;
  * @author Markus Beinlich
  */
 @MessageDriven(activationConfig = {
-    @ActivationConfigProperty(propertyName = "destinationLookup", propertyValue = "jms/PizzaOrderQueue")
+    @ActivationConfigProperty(propertyName = "destinationLookup", propertyValue = "jms/queue/PizzaOrderQueue")
     ,
         @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue")
 })
