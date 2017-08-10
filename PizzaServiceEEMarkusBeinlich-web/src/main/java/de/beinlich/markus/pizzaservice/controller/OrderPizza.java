@@ -15,10 +15,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Hashtable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Observes;
 import javax.faces.application.FacesMessage;
@@ -88,8 +88,31 @@ public class OrderPizza implements Serializable {
 
     private CustomerEjbRemote lookupCustomerEjbRemote() {
         try {
-            Context c = new InitialContext();
-            return (CustomerEjbRemote) c.lookup("ejb/customerEjb");
+            final Hashtable jndiProperties = new Hashtable();
+            jndiProperties.put(Context.URL_PKG_PREFIXES, "org.jboss.ejb.client.naming");
+            final Context context = new InitialContext(jndiProperties);
+            // The app name is the application name of the deployed EJBs. This is typically the ear name
+            // without the .ear suffix. However, the application name could be overridden in the application.xml of the
+            // EJB deployment on the server.
+            // Since we haven't deployed the application as a .ear, the app name for us will be an empty string
+            final String appName = "";
+            // This is the module name of the deployed EJBs on the server. This is typically the jar name of the
+            // EJB deployment, without the .jar suffix, but can be overridden via the ejb-jar.xml
+            // In this example, we have deployed the EJBs in a jboss-as-ejb-remote-app.jar, so the module name is
+            // jboss-as-ejb-remote-app
+            final String moduleName = "PizzaServiceEEMarkusBeinlich-ejb-1.0-SNAPSHOT";
+            // AS7 allows each deployment to have an (optional) distinct name. We haven't specified a distinct name for
+            // our EJB deployment, so this is an empty string
+            final String distinctName = "";
+            // The EJB name which by default is the simple class name of the bean implementation class
+            final String beanName = "CustomerEjb";
+            // the remote view fully qualified class name
+            final String viewClassName = CustomerEjbRemote.class.getName();
+            // let's do the lookup
+            return (CustomerEjbRemote) context.lookup("ejb:" + appName + "/" + moduleName + "/" + distinctName + "/" + beanName + "!" + viewClassName);
+
+//            Context c = new InitialContext();
+//            return (CustomerEjbRemote) context.lookup("ejb/customerEjb");
         } catch (NamingException ne) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
             throw new RuntimeException(ne);
@@ -98,8 +121,30 @@ public class OrderPizza implements Serializable {
 
     private OrderEjbRemote lookupOrderEjbRemote() {
         try {
-            Context c = new InitialContext();
-            return (OrderEjbRemote) c.lookup("ejb/orderEjb");
+            final Hashtable jndiProperties = new Hashtable();
+            jndiProperties.put(Context.URL_PKG_PREFIXES, "org.jboss.ejb.client.naming");
+            final Context context = new InitialContext(jndiProperties);
+            // The app name is the application name of the deployed EJBs. This is typically the ear name
+            // without the .ear suffix. However, the application name could be overridden in the application.xml of the
+            // EJB deployment on the server.
+            // Since we haven't deployed the application as a .ear, the app name for us will be an empty string
+            final String appName = "";
+            // This is the module name of the deployed EJBs on the server. This is typically the jar name of the
+            // EJB deployment, without the .jar suffix, but can be overridden via the ejb-jar.xml
+            // In this example, we have deployed the EJBs in a jboss-as-ejb-remote-app.jar, so the module name is
+            // jboss-as-ejb-remote-app
+            final String moduleName = "PizzaServiceEEMarkusBeinlich-ejb-1.0-SNAPSHOT";
+            // AS7 allows each deployment to have an (optional) distinct name. We haven't specified a distinct name for
+            // our EJB deployment, so this is an empty string
+            final String distinctName = "";
+            // The EJB name which by default is the simple class name of the bean implementation class
+            final String beanName = "OrderEjb";
+            // the remote view fully qualified class name
+            final String viewClassName = OrderEjbRemote.class.getName();
+            // let's do the lookup
+            return (OrderEjbRemote) context.lookup("ejb:" + appName + "/" + moduleName + "/" + distinctName + "/" + beanName + "!" + viewClassName);
+//            Context c = new InitialContext();
+//            return (OrderEjbRemote) c.lookup("ejb/orderEjb");
         } catch (NamingException ne) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
             throw new RuntimeException(ne);
@@ -108,8 +153,30 @@ public class OrderPizza implements Serializable {
 
     private MenuEjbRemote lookupMenuEjbRemote() {
         try {
-            Context c = new InitialContext();
-            return (MenuEjbRemote) c.lookup("ejb/menuEjb");
+            final Hashtable jndiProperties = new Hashtable();
+            jndiProperties.put(Context.URL_PKG_PREFIXES, "org.jboss.ejb.client.naming");
+            final Context context = new InitialContext(jndiProperties);
+            // The app name is the application name of the deployed EJBs. This is typically the ear name
+            // without the .ear suffix. However, the application name could be overridden in the application.xml of the
+            // EJB deployment on the server.
+            // Since we haven't deployed the application as a .ear, the app name for us will be an empty string
+            final String appName = "";
+            // This is the module name of the deployed EJBs on the server. This is typically the jar name of the
+            // EJB deployment, without the .jar suffix, but can be overridden via the ejb-jar.xml
+            // In this example, we have deployed the EJBs in a jboss-as-ejb-remote-app.jar, so the module name is
+            // jboss-as-ejb-remote-app
+            final String moduleName = "PizzaServiceEEMarkusBeinlich-ejb-1.0-SNAPSHOT";
+            // AS7 allows each deployment to have an (optional) distinct name. We haven't specified a distinct name for
+            // our EJB deployment, so this is an empty string
+            final String distinctName = "";
+            // The EJB name which by default is the simple class name of the bean implementation class
+            final String beanName = "MenuEjb";
+            // the remote view fully qualified class name
+            final String viewClassName = MenuEjbRemote.class.getName();
+            // let's do the lookup
+            return (MenuEjbRemote) context.lookup("ejb:" + appName + "/" + moduleName + "/" + distinctName + "/" + beanName + "!" + viewClassName);
+//            Context c = new InitialContext();
+//            return (MenuEjbRemote) c.lookup("ejb/menuEjb");
         } catch (NamingException ne) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
             throw new RuntimeException(ne);
@@ -138,30 +205,30 @@ public class OrderPizza implements Serializable {
         order.setCustomer(customer);
         order.setOrderDate(LocalDateTime.now());
 
-        this.saveJms();
+        this.save();
         submitted = true;
         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Vielen Dank für Ihre Bestellung", "Guten Appetit.");
         RequestContext.getCurrentInstance().showMessageInDialog(message);
     }
-    @Inject
-    @JMSConnectionFactory("java:comp/DefaultJMSConnectionFactory")
-    private JMSContext context;
-
-    @Resource(lookup = "jms/queue/PizzaOrderQueue")
-    Queue pizzaOrderQueue;
-
-    public void saveJms() {
-
-        JMSProducer producer = context.createProducer();
-        ObjectMessage objectMessage = context.createObjectMessage();
-        try {
-            objectMessage.setObject(order);
-            producer.send(pizzaOrderQueue, objectMessage);
-        } catch (JMSException ex) {
-            Logger.getLogger(OrderPizza.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-    }
+//    @Inject
+//    @JMSConnectionFactory("java:comp/DefaultJMSConnectionFactory")
+//    private JMSContext context;
+//
+//    @Resource(lookup = "jms/queue/PizzaOrderQueue")
+//    Queue pizzaOrderQueue;
+//
+//    public void saveJms() {
+//
+//        JMSProducer producer = context.createProducer();
+//        ObjectMessage objectMessage = context.createObjectMessage();
+//        try {
+//            objectMessage.setObject(order);
+//            producer.send(pizzaOrderQueue, objectMessage);
+//        } catch (JMSException ex) {
+//            Logger.getLogger(OrderPizza.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//
+//    }
 
     public void save() {
         orderEjb.saveOrder(order);
